@@ -5,55 +5,55 @@ import (
 	"strconv"
 )
 
-type Single struct {
+type IDCard struct {
 	regEx  *regexp.Regexp
 	symbol string
 }
 
-func NewSingle(symbol string) *Single {
+func NewIDCard(symbol string) *IDCard {
 	regEx := regexp.MustCompile(`(\d{18})|(\d{17}[x|X])`)
-	return &Single{regEx, symbol}
+	return &IDCard{regEx, symbol}
 }
 
-func NewSingleWithRegEx(symbol string, regExStr string) *Single {
+func NewIDCardWithRegEx(symbol string, regExStr string) *IDCard {
 	regEx := regexp.MustCompile(regExStr)
-	return &Single{regEx, symbol}
+	return &IDCard{regEx, symbol}
 }
 
-func (single *Single) SetRegEx(str string) {
-	single.regEx = regexp.MustCompile(str)
+func (idCard *IDCard) SetRegEx(str string) {
+	idCard.regEx = regexp.MustCompile(str)
 }
 
-func (single *Single) RegEx() *regexp.Regexp {
-	return single.regEx
+func (idCard *IDCard) RegEx() *regexp.Regexp {
+	return idCard.regEx
 }
 
-func (single *Single) SetSymbol(symbol string) {
-	single.symbol = symbol
+func (idCard *IDCard) SetSymbol(symbol string) {
+	idCard.symbol = symbol
 }
 
-func (single *Single) Symbol() string {
-	return single.symbol
+func (idCard *IDCard) Symbol() string {
+	return idCard.symbol
 }
 
-func (single *Single) FindAll(line []byte) []string {
+func (idCard *IDCard) FindAll(line []byte) []string {
 	found := []string{}
 	replaceRe := regexp.MustCompile(`[-\s]`)
 
-	foundInLine := single.regEx.FindAll(line, -1)
+	foundInLine := idCard.regEx.FindAll(line, -1)
 	for _, item := range foundInLine {
 		found = append(found, string(replaceRe.ReplaceAll(item, []byte{})))
 	}
 	return found
 }
 
-func (single *Single) FindAllAndValid(line []byte) []string {
+func (idCard *IDCard) FindAllAndValid(line []byte) []string {
 	found := []string{}
 	replaceRe := regexp.MustCompile(`[-\s]`)
 
-	foundInLine := single.regEx.FindAll(line, -1)
+	foundInLine := idCard.regEx.FindAll(line, -1)
 	for _, item := range foundInLine {
-		if single.Validate(item) {
+		if ValidIDCard(item) {
 			found = append(found, string(replaceRe.ReplaceAll(item, []byte{})))
 		}
 	}
@@ -61,7 +61,7 @@ func (single *Single) FindAllAndValid(line []byte) []string {
 }
 
 // 身份证号码校验算法
-func (single *Single) Validate(item []byte) bool {
+func ValidIDCard(item []byte) bool {
 	if len(item) != 18 {
 		return false
 	}
@@ -78,6 +78,6 @@ func (single *Single) Validate(item []byte) bool {
 	return sum%11 == 1
 }
 
-func (single *Single) String() string {
-	return "(" + single.symbol + ")"
+func (idCard *IDCard) String() string {
+	return "{" + idCard.symbol + ": `" + idCard.regEx.String() + "`}"
 }

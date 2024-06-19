@@ -9,53 +9,49 @@ import (
 	"strings"
 )
 
-type Multiple struct {
+type PhoneNumber struct {
 	regEx  *regexp.Regexp
 	symbol string
 }
 
-func NewMultiple(symbol string) *Multiple {
+func NewPhoneNumber(symbol string) *PhoneNumber {
 	regEx := regexp.MustCompile(`\d{11}`)
-	return &Multiple{regEx, symbol}
+	return &PhoneNumber{regEx, symbol}
 }
 
-func NewMultipleWithRegEx(symbol string, regExStr string) *Multiple {
+func NewPhoneNumberWithRegEx(symbol string, regExStr string) *PhoneNumber {
 	regEx := regexp.MustCompile(regExStr)
-	return &Multiple{regEx, symbol}
+	return &PhoneNumber{regEx, symbol}
 }
 
-func (mult *Multiple) SetRegEx(str string) {
-	mult.regEx = regexp.MustCompile(str)
+func (pn *PhoneNumber) SetRegEx(str string) {
+	pn.regEx = regexp.MustCompile(str)
 }
 
-func (mult *Multiple) RegEx() *regexp.Regexp {
-	return mult.regEx
+func (pn *PhoneNumber) RegEx() *regexp.Regexp {
+	return pn.regEx
 }
 
-func (mult *Multiple) SetSymbol(symbol string) {
-	mult.symbol = symbol
+func (pn *PhoneNumber) SetSymbol(symbol string) {
+	pn.symbol = symbol
 }
 
-func (mult *Multiple) Symbol() string {
-	return mult.symbol
+func (pn *PhoneNumber) Symbol() string {
+	return pn.symbol
 }
 
-func (mult *Multiple) FindAll(line []byte) []string {
+func (pn *PhoneNumber) FindAll(line []byte) []string {
 	found := []string{}
 	replaceRe := regexp.MustCompile(`[-\s]`)
 
-	foundInLine := mult.regEx.FindAll(line, -1)
+	foundInLine := pn.regEx.FindAll(line, -1)
 	for _, item := range foundInLine {
 		found = append(found, string(replaceRe.ReplaceAll(item, []byte{})))
 	}
 	return found
 }
 
-func (mult *Multiple) String() string {
-	return "{" + mult.symbol + ": `" + mult.regEx.String() + "`}"
-}
-
-func (mult *Multiple) PrefixFromFile(path string) string {
+func (pn *PhoneNumber) PrefixFromFile(path string) string {
 	var prefix []string
 
 	file, err := os.Open(path)
@@ -77,4 +73,8 @@ func (mult *Multiple) PrefixFromFile(path string) string {
 	}
 
 	return fmt.Sprintf(`(%s)`, strings.Join(prefix, "|"))
+}
+
+func (pn *PhoneNumber) String() string {
+	return "{" + pn.symbol + ": `" + pn.regEx.String() + "`}"
 }
