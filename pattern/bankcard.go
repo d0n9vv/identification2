@@ -1,8 +1,8 @@
 package pattern
 
 import (
-	"fmt"
 	"regexp"
+	"strconv"
 )
 
 type BankCard struct {
@@ -47,19 +47,15 @@ func (bankCard *BankCard) FindAll(line []byte) []string {
 	return found
 }
 
-func (bankCard *BankCard) FindAllAndValbank(line []byte) []string {
+func (bankCard *BankCard) FindAllAndValid(line []byte) []string {
 	found := []string{}
 	replaceRe := regexp.MustCompile(`[-\s]`)
 
 	foundInLine := bankCard.regEx.FindAll(line, -1)
 	for _, item := range foundInLine {
-		fmt.Println("------")
-		fmt.Println(string(item))
 		if ValidBankCard(item) {
 			found = append(found, string(replaceRe.ReplaceAll(item, []byte{})))
 		}
-		fmt.Println("======")
-		fmt.Println(string(item))
 	}
 	return found
 }
@@ -67,17 +63,28 @@ func (bankCard *BankCard) FindAllAndValbank(line []byte) []string {
 // 银行卡号校验算法
 func ValidBankCard(item []byte) bool {
 	sum := 0
-	// slices.Reverse(item)
+	revPos := 1
+	for pos := len(item) - 1; pos >= 0; pos-- {
+		if revPos%2 == 0 {
+			// 偶数位 乘 2, 再转换成字符串
+			x, _ := strconv.Atoi(string(item[pos]))
+			strX := []byte(strconv.Itoa(x * 2))
 
-	for i, v := range item {
-		// 	if v >= 48 && v <= 57 { // 0 - 9
-		// 		vv, _ := strconv.Atoi(string(v))
-		// 		sum += vv * factor[i]
-		// 	} else { // X | x
-		// 		sum += 10 * factor[i]
-		// 	}
+			// 将上一步转换的字符串拆分成数字并求和
+			m := 0
+			for _, k := range strX {
+				n, _ := strconv.Atoi(string(k))
+				m += n
+			}
+			sum += m
+		} else {
+			x, _ := strconv.Atoi(string(item[pos]))
+			sum += x
+		}
+		revPos++
 	}
-	return sum%11 == 1
+
+	return sum%10 == 0
 }
 
 func (bankCard *BankCard) String() string {

@@ -35,6 +35,10 @@ func main() {
 	bankCard19.SetRegEx(phoneNumber.PrefixFromFile(filepath.Join(ROOT, "rulelist/bankList.txt")) + `([-\s]*\d){13}`)
 	fmt.Println(bankCard19)
 
+	bankCard16 := pattern.NewBankCard("BankCard")
+	bankCard16.SetRegEx(phoneNumber.PrefixFromFile(filepath.Join(ROOT, "rulelist/bankList.txt")) + `([-\s]*\d){10}`)
+	fmt.Println(bankCard16)
+
 	errRead := filepath.Walk(filepath.Join(ROOT, "testdata"), func(path string, info fs.FileInfo, err error) error {
 		if !info.IsDir() {
 			fmt.Println("file:", path)
@@ -65,9 +69,14 @@ func main() {
 					writer.WriteString(fmt.Sprintf("%s-%d-%s-%s\n", info.Name(), row, phoneNumber.Symbol(), found))
 				}
 
-				bankCard19Found := bankCard19.FindAllAndValbank(line)
+				bankCard19Found := bankCard19.FindAllAndValid(line)
 				for _, found := range bankCard19Found {
 					writer.WriteString(fmt.Sprintf("%s-%d-%s-%s\n", info.Name(), row, bankCard19.Symbol(), found))
+				}
+
+				bankCard16Found := bankCard16.FindAllAndValid(line)
+				for _, found := range bankCard16Found {
+					writer.WriteString(fmt.Sprintf("%s-%d-%s-%s\n", info.Name(), row, bankCard16.Symbol(), found))
 				}
 
 				writer.Flush()
